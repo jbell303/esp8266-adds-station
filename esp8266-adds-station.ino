@@ -7,6 +7,7 @@
  */
 
 String header = "HTTP/1.1 200 OK\r\nContent-Type: JSON\r\n\r\n";
+String textHeader = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
 
 String html_1 = R"=====(
 <!DOCTYPE html>
@@ -47,6 +48,38 @@ function ajaxLoad(station_id) {
       document.getElementById("ceiling").innerHTML = "Ceiling: " + response.ceiling;
       document.getElementById("wind_speed").innerHTML = "Wind speed: " + response.wind_speed;
       document.getElementById("submit_button").value = "Fetch Weather";
+      document.getElementById("toggle_button").value = (response.isDrinkingWeather ? "Set Flying Weather" : "Set Drinking Weather");
+    }
+  }
+  ajaxRequest.send();
+}
+
+function toggleLed () {
+  var button_text = document.getElementById("toggle_button").value;
+  if (button_text == "Set Drinking Weather") {
+    document.getElementById("toggle_button").value = "Setting Drinking Weather";
+    ajaxLED('DRINKING');
+  } else {
+    document.getElementById("toggle_button").value = "Setting Flying Weather";
+    ajaxLED('FLYING');
+  }
+}
+
+function ajaxLED(ajaxURL) {
+  if (!ajaxRequest) {
+    alert("AJAX is not supported.");
+    return;
+  }
+
+  ajaxRequest.open("GET", ajaxURL, true);
+  ajaxRequest.onreadystatechange = function () {
+    if (ajaxRequest.readyState == 4 && ajaxRequest.status == 200) {
+      var ajaxResult = ajaxRequest.responseText;
+      if (ajaxResult == "Flying Weather") {
+        document.getElementById("toggle_button").value = "Set Drinking Weather";
+      } else if (ajaxResult == "Drinking Weather") {
+        document.getElementById("toggle_button").value = "Set Flying Weather";
+      }
     }
   }
   ajaxRequest.send();
@@ -71,7 +104,9 @@ function ajaxLoad(station_id) {
         </form>
       </div>
      </form>
-    
+  </div>
+  <div>
+    <input type="button" id="toggle_button" onclick="toggleLed()" value="Set Flying Weather"/>
   </div>
 </body>
 </html>
@@ -107,6 +142,11 @@ String ceiling = "";
 #define LED_COUNT    18
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// button
+const int buttonPin = 13;
+uint16_t n = 0;
+uint32_t color = 0;
 
 String getValueforTag(String line, String tag) {
   String matchString;
@@ -250,6 +290,7 @@ void connectToWifi(){
 
 
 void setup() {
+  pinMode(buttonPin, INPUT_PULLUP);
   Serial.begin(115200);
 
   String request = "";
@@ -265,6 +306,33 @@ void setup() {
 
 void loop() {
 
+  // toggle button
+  if (digitalRead(buttonPin) == LOW) {
+    Serial.println("Button pressed...");
+    color = strip.getPixelColor(1);
+    Serial.print("Color: ");
+    Serial.println(color);
+    n = strip.numPixels();
+    Serial.print("n: ");
+    Serial.println(n);
+    if (n == 0 || color == 0){
+      Serial.println("Setting red...");
+      strip.clear();
+      strip.fill(strip.Color(150, 0, 0));
+      strip.show();
+    } else if (color == 9502720){
+      Serial.println("Setting green...");
+      strip.clear();
+      strip.fill(strip.Color(0, 150, 0));
+      strip.show();
+    } else if (color == 37120){
+      Serial.println("Clearing strip...");
+      strip.clear();
+      strip.show();
+    }
+    delay(500);
+  }
+  
   // check if a client has connected
   WiFiClient client = server.available();
   if (!client) {
@@ -288,7 +356,7 @@ void loop() {
     fetchWeather();
 
     // JSON 
-    const size_t capacity = JSON_OBJECT_SIZE(6);
+    const size_t capacity = JSON_OBJECT_SIZE(7);
     DynamicJsonDocument doc(capacity);
     
     // serialize json response
@@ -296,12 +364,25 @@ void loop() {
     doc["flight_category"] = flight_category;
     doc["ceiling"] = (ceiling.toInt() >= 50000 ? "None" : ceiling + " feet");
     doc["wind_speed"] = String(wind_speed) + " knots";
+    doc["isDrinkingWeather"] = isDrinkingWeather(flight_category, wind_speed, ceiling);
 
     serializeJson(doc, Serial);
 
     // send response to client
     client.print(header);
     serializeJson(doc, client); 
+  } else if (request.indexOf("DRINKING") > 0) {
+    strip.clear();
+    strip.fill(strip.Color(150, 0, 0));
+    strip.show();
+    client.print(textHeader);
+    client.print("Drinking Weather");
+  } else if (request.indexOf("FLYING") > 0) {
+    strip.clear();
+    strip.fill(strip.Color(0, 150, 0));
+    strip.show();
+    client.print(textHeader);
+    client.print("Flying Weather");
   } else {
     client.flush();
     client.print(header);
