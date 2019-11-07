@@ -126,7 +126,7 @@ WiFiServer server(80);
 // ADDS
 const char* host = "aviationweather.gov";
 const int httpsPort = 443;
-const char* fingerprint = "1ce610e06d392674ee443a469b449977aca3d472";
+const char* fingerprint = "29f037bace863c943c3bdf2ce5303a243eaef491";
 String identifier = "KNFL";
 String url = "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
 
@@ -138,15 +138,16 @@ int wind_speed = 0;
 String ceiling = "";
 
 // NeoPixels
-#define LED_PIN    12
-#define LED_COUNT    18
+#define LED_PIN    5
+#define LED_COUNT    36
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // button
 const int buttonPin = 13;
 uint16_t n = 0;
-uint32_t color = 0;
+uint32_t green_strip = 0;
+uint32_t red_strip = 0;
 
 String getValueforTag(String line, String tag) {
   String matchString;
@@ -174,12 +175,12 @@ String getValueforParameter(String line, String param) {
 bool isDrinkingWeather(String flight_category, int wind_speed, String ceiling) {
   if (flight_category == "IFR" || ceiling.toInt() < 3000 || wind_speed > 25) {
     strip.clear();
-    strip.fill(strip.Color(150, 0, 0));
+    strip.fill(strip.Color(150, 0, 0), 26, 26);
     strip.show();
     return true;
   }
   strip.clear();
-  strip.fill(strip.Color(0, 150, 0));
+  strip.fill(strip.Color(0, 150, 0), 0, 26);
   strip.show();
   return false;
 }
@@ -287,7 +288,8 @@ void connectToWifi(){
   Serial.println("Server started"); 
 }
 
-
+unsigned long timer;
+bool timerActive;
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
@@ -298,10 +300,13 @@ void setup() {
   // initialize NeoPixels
   strip.begin();
   strip.show();
-  strip.setBrightness(50);
+  //strip.setBrightness(50);
 
   // connect to wifi
   connectToWifi();
+
+  // start the timer
+  timerActive = true;
 }
 
 void loop() {
@@ -309,28 +314,34 @@ void loop() {
   // toggle button
   if (digitalRead(buttonPin) == LOW) {
     Serial.println("Button pressed...");
-    color = strip.getPixelColor(1);
+    green_strip = strip.getPixelColor(1);
+    red_strip = strip.getPixelColor(1);
     Serial.print("Color: ");
-    Serial.println(color);
+    Serial.println(green_strip);
+    Serial.println(red_strip);
     n = strip.numPixels();
     Serial.print("n: ");
     Serial.println(n);
-    if (n == 0 || color == 0){
+    if (red_strip == 0 && green_strip == 0){
       Serial.println("Setting red...");
       strip.clear();
-      strip.fill(strip.Color(150, 0, 0));
+      strip.fill(strip.Color(150, 0, 0), 0, 26);
       strip.show();
-    } else if (color == 9502720){
+    } else if (red_strip == 9502720){
       Serial.println("Setting green...");
       strip.clear();
-      strip.fill(strip.Color(0, 150, 0));
+      strip.fill(strip.Color(0, 150, 0), 0, 26);
       strip.show();
-    } else if (color == 37120){
+    } else if (green_strip == 37120){
       Serial.println("Clearing strip...");
       strip.clear();
       strip.show();
     }
     delay(500);
+  }
+
+  if (timerActive && (millis() % 60000) == 0) {
+    fetchWeather();
   }
   
   // check if a client has connected
@@ -353,6 +364,7 @@ void loop() {
       int paramEnd = paramStart + 4;
       identifier = request.substring(paramStart, paramEnd);
     }
+    timerActive = true;
     fetchWeather();
 
     // JSON 
@@ -372,14 +384,16 @@ void loop() {
     client.print(header);
     serializeJson(doc, client); 
   } else if (request.indexOf("DRINKING") > 0) {
+    timerActive = false;
     strip.clear();
-    strip.fill(strip.Color(150, 0, 0));
+    strip.fill(strip.Color(150, 0, 0), 26, 26);
     strip.show();
     client.print(textHeader);
     client.print("Drinking Weather");
   } else if (request.indexOf("FLYING") > 0) {
+    timerActive = false;
     strip.clear();
-    strip.fill(strip.Color(0, 150, 0));
+    strip.fill(strip.Color(0, 150, 0), 0, 26);
     strip.show();
     client.print(textHeader);
     client.print("Flying Weather");
