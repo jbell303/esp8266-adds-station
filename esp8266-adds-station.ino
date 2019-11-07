@@ -116,10 +116,12 @@ function ajaxLED(ajaxURL) {
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
 
 // WIFI
-const char* ssid =  "JamesBell'sNetwork_2.4";
-const char* password = "Ju51!3@Io";
+//const char* ssid =  "JamesBell'sNetwork_2.4";
+//const char* password = "Ju51!3@Io";
 
 WiFiServer server(80);
 
@@ -266,18 +268,23 @@ void fetchWeather() {
 
 void connectToWifi(){
   // connect to wifi
-  Serial.println("connecting to ");
-  Serial.println(ssid);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+//  Serial.println("connecting to ");
+//  Serial.println(ssid);
+//  WiFi.mode(WIFI_STA);
+//  WiFi.begin(ssid, password);
+//  while (WiFi.status() != WL_CONNECTED) {
+//    delay(500);
+//    Serial.print(".");
+//  }
+//  Serial.println("");
+//  Serial.println("WiFi connected");
+//  Serial.println("IP address: ");
+//  Serial.println(WiFi.localIP());
+
+  // connect using wifimanager
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("WeatherStation");
+  Serial.println("Connected.");
 
   // start a server
   server.begin();
