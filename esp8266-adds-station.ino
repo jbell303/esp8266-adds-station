@@ -118,10 +118,11 @@ function ajaxLED(ajaxURL) {
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
+//#include <ESP8266mDNS.h>
 
 // WIFI
-//const char* ssid =  "JamesBell'sNetwork_2.4";
-//const char* password = "Ju51!3@Io";
+const char* ssid =  "JamesBell'sNetwork_2.4";
+const char* password = "Ju51!3@Io";
 
 WiFiServer server(80);
 
@@ -186,6 +187,8 @@ bool isDrinkingWeather(String flight_category, int wind_speed, String ceiling) {
 void fetchWeather() {
   // Use WiFiClientSecure to create TLS connection
   WiFiClientSecure client;
+//  BearSSL::WiFiClientSecure client;
+//  client.setInsecure();
 
   Serial.printf("\nConnecting to %s ...", host);
   Serial.print("\nFetching weather for...");
@@ -200,12 +203,22 @@ void fetchWeather() {
     Serial.println("connection failed");
     return;
   }
+//   if (!client.connect(host, 80)) {
+//    Serial.println("connection failed");
+//    return;
+//  }
   Serial.println("connected");
   
   // verify fingerprint from host
-  if (client.verify(fingerprint, host)) {
-     Serial.println("certificate matches");
-     Serial.println("[Sending a request]");
+//  if (client.verify(fingerprint, host)) {
+//     Serial.println("certificate matches");
+//      
+//  } else { // close the connection if certificate does not match
+//     Serial.println("certificate doesn't match");
+//     client.stop();
+//     Serial.println("\n[Disconnected]");
+//  }
+  Serial.println("[Sending a request]");
      client.print(String("GET ") + url + identifier + " HTTP/1.1\r\n" +
                   "Host: " + host + "\r\n" +
                   "User-Agent: BuildFailureDetectorESP8266\r\n" +
@@ -258,34 +271,34 @@ void fetchWeather() {
      Serial.println("wind speed: " + String(wind_speed) + " knots");
      Serial.println(isDrinkingWeather(flight_category, wind_speed, ceiling) ? "Drinking Weather" : "Flying Weather");
      client.stop();
-     Serial.println("[Disconnected]"); 
-  } else { // close the connection if certificate does not match
-     Serial.println("certificate doesn't match");
-     client.stop();
-     Serial.println("\n[Disconnected]");
-  }
+     Serial.println("[Disconnected]");
 }
 
 void connectToWifi(){
   // connect to wifi
-//  Serial.println("connecting to ");
-//  Serial.println(ssid);
-//  WiFi.mode(WIFI_STA);
-//  WiFi.begin(ssid, password);
-//  while (WiFi.status() != WL_CONNECTED) {
-//    delay(500);
-//    Serial.print(".");
-//  }
-//  Serial.println("");
-//  Serial.println("WiFi connected");
-//  Serial.println("IP address: ");
-//  Serial.println(WiFi.localIP());
+  Serial.println("connecting to ");
+  Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 
   // connect using wifimanager
-  WiFiManager wifiManager;
-  wifiManager.autoConnect("WeatherStation");
+//  WiFiManager wifiManager;
+//  wifiManager.autoConnect("WeatherStation");
+  
   Serial.println("Connected.");
 
+  //try mDNS
+//  if (!MDNS.begin("weatherstation"))  { Serial.println("Error setting up mDNS responder!"); }
+//                                      { Serial.println("mDNS responder started!"); }
+  
   // start a server
   server.begin();
   Serial.println("Server started"); 
