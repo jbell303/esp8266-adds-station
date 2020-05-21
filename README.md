@@ -21,10 +21,31 @@ Here is the basic layout for the electronics:
 
 I used a breadboard in the diagram for simplification, however, the actual assembly was mounted on the terminal block Featherwing
 depicted in the lower-left corner. You can mount the 74AHCT125 in the center of the Featherwing and the ESP8266 will still fit on top.
-the diode and resistor can be mounted on the far left of the Featherwing. I mounted the capacitor in the DC terminal block as it would not
-fit anywhere else without interfering with the USB port on the ESP8266.
+the diode and resistor can be mounted on the far left of the Featherwing. I mounted the capacitor in the DC terminal block as it would not fit anywhere else without interfering with the USB port on the ESP8266.
 
-I used these diagrams for reference:
+The NeoPixel strips were divided into four sections around the wood frame.
+![NeoPixel Layout](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/neopixel_wiring.png)
+Note that the Neopixel strip can terminate without any additional connections. Make sure to use flexible wiring as the copper connectors on the NeoPixels are delicate. Also, note the number of Neopixels you use in each strip as this will be important when writing the Arduino sketch.
+
+Reference:
 1. [Adafruit Neopixel Uberguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/basic-connections)
 2. [Neopixel Raspberry Pi Wiring](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring)
 3. [ESP8266 Neopixel Wiring](https://forums.adafruit.com/viewtopic.php?t=112430)
+
+### Software
+[Arduino](https://www.arduino.cc/)
+Required Libraries:
+* ESP8266 WiFi
+* ESP8266 WebServer
+* ESP8266 mDNS
+* [ArduinoJSON](https://arduinojson.org/)
+* [AutoConnect](https://github.com/Hieromon/AutoConnect)
+* Adafruit Neopixel
+
+## Installation
+Simply open Arduino and add the required libraries. Clone this repo for the `.ino` sketch and load onto the board.
+You will need to make modifications to the NeoPixel variables and GPIO ports to reflect your own wiring. You will not need
+to provide your SSID or Password if you use AutoConnect. I recommend looking at the [Getting Started](https://hieromon.github.io/AutoConnect/gettingstarted.html) guide to learn more about how to use AutoConnect.
+
+## Usage
+Use the Arduino Monitor when you first use the sketch. It will output the local IP address (mDNS is esp8266.local) and the status of the server and requests. Navigate to the server's local IP on a web browser (e.g. 192.168.x.x) and you should see an html form. Enter a station identifier (e.g. KLAX for Los Angeles Int'l Airport) and press `Fetch Weather`. The weather will return with `Drinking Weather` if the conditions are IFR, ceiling less than 2000' or winds >25 knots. Feel free to change this in the code. There is also an HTML button to manually toggle drinking/flying weather. Finally, a button can be connected to a GPIO port to toggle the lights drinking/flying/off without the need to connect a web client. Enjoy!
