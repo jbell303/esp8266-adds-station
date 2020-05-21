@@ -25,7 +25,7 @@ The diode and resistor can be mounted on the far left of the Featherwing. I moun
 
 The NeoPixel strips were divided into four sections around the wood frame.
 ![NeoPixel Layout](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/neopixel_wiring.png)
-Note that the Neopixel strip can terminate without any additional connections. Make sure to use flexible wiring as the copper connectors on the NeoPixels are delicate. Also, note the number of Neopixels you use in each strip as this will be important when writing the Arduino sketch.
+Note that the Neopixel strip can terminate without any additional connections. Make sure to use flexible wiring as the copper connectors on the NeoPixels are delicate. You can use JST connectors between the strips as a quick disconnect if needed. Also, note the number of Neopixels you use in each strip as this will be important when writing the Arduino sketch.
 
 Reference:
 1. [Adafruit Neopixel Uberguide](https://learn.adafruit.com/adafruit-neopixel-uberguide/basic-connections)
