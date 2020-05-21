@@ -21,7 +21,7 @@ Here is the basic layout for the electronics:
 
 I used a breadboard in the diagram for simplification, however, the actual assembly was mounted on the terminal block Featherwing
 depicted in the lower-left corner. You can mount the 74AHCT125 in the center of the Featherwing and the ESP8266 will still fit on top.
-the diode and resistor can be mounted on the far left of the Featherwing. I mounted the capacitor in the DC terminal block as it would not fit anywhere else without interfering with the USB port on the ESP8266.
+The diode and resistor can be mounted on the far left of the Featherwing. I mounted the capacitor in the DC terminal block as it would not fit anywhere else without interfering with the USB port on the ESP8266.
 
 The NeoPixel strips were divided into four sections around the wood frame.
 ![NeoPixel Layout](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/neopixel_wiring.png)
