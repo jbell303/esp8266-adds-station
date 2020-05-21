@@ -45,7 +45,7 @@ Required Libraries:
 ## Installation
 Simply open Arduino and add the required libraries. Clone this repo for the `.ino` sketch and load onto the board.
 You will need to make modifications to the NeoPixel variables and GPIO ports to reflect your own wiring. You will not need
-to provide your SSID or Password if you use AutoConnect. I recommend looking at the [Getting Started](https://hieromon.github.io/AutoConnect/gettingstarted.html) guide to learn more about how to use AutoConnect.
+to provide your SSID or Password if you use AutoConnect. I recommend looking at this [Getting Started](https://hieromon.github.io/AutoConnect/gettingstarted.html) guide to learn more about how to use AutoConnect.
 
 ## Usage
 Use the Arduino Monitor when you first use the sketch. It will output the local IP address (mDNS is esp8266.local) and the status of the server and requests. Navigate to the server's local IP on a web browser (e.g. 192.168.x.x) and you should see an html form. Enter a station identifier (e.g. KLAX for Los Angeles Int'l Airport) and press `Fetch Weather`. The weather will return with `Drinking Weather` if the conditions are IFR, ceiling less than 2000' or winds >25 knots. Feel free to change this in the code. There is also an HTML button to manually toggle drinking/flying weather. Finally, a button can be connected to a GPIO port to toggle the lights drinking/flying/off without the need to connect a web client. Enjoy!
