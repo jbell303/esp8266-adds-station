@@ -1,13 +1,13 @@
 # User Guide
-[Powering On](#Powering-On)  
+[Getting Started](#Getting-Started)  
 [Connecting to WiFi](#Connecting-to-WiFi-using-AutoConnect)  
 [Connecting via a Web Browser](#Connecting-via-a-web-browser)  
 [Updating the Software](#Updating-the-Software-(Arduino-sketch))  
 [Troubleshooting](#Troubleshooting-the-hardware)  
 
 
-## Powering On
-### Requirements
+## Getting Started
+### Power Requirements
 * You must use the DC 5V adapter to power the NeoPixels.  
 * A micro USB cable can be used to power the ESP8266 microcontroller in order to upload an new sketch.
 
@@ -24,21 +24,32 @@ Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html) 
 ### Setting the lights manually
 * The sign can be cycled through Drinking Weather -> Flying Weather -> OFF with the button on the back of the frame.
 
-## Connecting via a web browser
+## Connecting via a web browser  
+![screenshot](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/wx_screen.PNG)  
 * Open a web browser and navigate to [http://weather.local/](http://weather.local/)  
 *Note: the `weather.local` address uses mDNS and works best on iOS or Mac, Windows requires installation of [Bonjour](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US). Android is not supported.*  
 * You can also connect via the local IP address (e.g. `192.168.x.x`)  
 * To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen.  
 
 ## Checking the weather
-Type the four-letter identifier of the airport you want to check and press `Fetch Weather`.  
+Type the four-letter identifier of the airport you want to check and press ![Fetch Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fetch_button.PNG). 
+
+## Drinking Weather Parameters
+* IFR or LIFR  
+* Ceiling < 3000' AGL  
+* Wind Speed > 25 knots  
+
+*To change these parameters see [Updating the Software](#Updating-the-Software-(Arduino-sketch))*
 
 ## Setting 'Flying Weather' or 'Drinking Weather' via a web browser
-Press the `Set Flying Weather` or `Set Drinking Weather` button on the screen to toggle the lights.
+Press the ![Set Flying Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fly_button.PNG) or ![Set Drinking Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/drink_button.PNG) button on the screen to toggle the lights.
 
 ## Updating the Software (Arduino sketch)
 ### 1. Clone this Repo
-Using  `terminal` on a Mac, or `CMD` in Windows, navigate to the directory you want to install the software and type `git clone https://github.com/jbell303/esp8266-weather-station-with-neopixels.git`
+Using  `terminal` on a Mac, or `CMD` in Windows, navigate to the directory you want to install the software and type: 
+```
+git clone https://github.com/jbell303/esp8266-weather-station-with-neopixels.git
+```  
 *Note you may need to first install [Git](https://git-scm.com/).
 
 ### 2. Install Arduino 
@@ -60,6 +71,14 @@ Open the `.ino` file from the repo cloned earlier.
 ### 6. Make the required changes
 Make the required code changes then hit `verify` (the checkmark).  
 Be sure to save your work.
+
+#### Example: Update the `.local` address:
+Open the `esp8266-adds-station.ino` file in Arduino.
+Change the `mdns_name[]` variable from `weather` to the name you want (no whitespace).
+
+#### Example: Update the drinking weather parameters:
+Open the `esp8266-adds-station.ino` file in Arduino.
+Change the `MIN_CEILING` and `MAX_WIND_SPEED` parameters to the desired values (e.g. `#define MIN_CEILING 2000`).
 
 ### 7. Upload the new sketch to the ESP8266
 There are two ways to upload the sketch:  
