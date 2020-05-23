@@ -17,7 +17,7 @@
 * If the sign is powered on and successully connects to WiFi, it will grab the weather for KNFL from ADDS and turn the lights on automatically.
 
 ### Connecting to WiFi using AutoConnect
-Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html) starting at the `Run at first` step. Skip the first section about loading a sketch.
+Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html#run-at-first) to connect the board to a new access point using your phone.
 
 ### Weather Update Cylce 
 * The ESP8266 grabs the current METAR once per minute.
