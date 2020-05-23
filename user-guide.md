@@ -4,6 +4,7 @@
 [Connecting via a Web Browser](#Connecting-via-a-web-browser)  
 [Updating the Software](#Updating-the-Software-(Arduino-sketch))  
 [Troubleshooting](#Troubleshooting-the-hardware)  
+[Common Issues](#Common-Issues)
 
 
 ## Getting Started
