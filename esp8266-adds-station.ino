@@ -9,7 +9,7 @@
 // ADDS 
 const char* host = "aviationweather.gov";
 const int httpsPort = 443;
-const char* fingerprint = "07e32864918f4238a0542a2ccdc17c98798ca1d8";
+const char fingerprint[] PROGMEM = "07e32864918f4238a0542a2ccdc17c98798ca1d8";
 String identifier = "KNFL";
 String url = "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
 
