@@ -2,7 +2,7 @@
 [Getting Started](#Getting-Started)  
 [Connecting to WiFi](#Connecting-to-WiFi-using-AutoConnect)  
 [Checking the Weather via a Web Browser](#Checking-the-weather-via-a-web-browser)  
-[Setting the Lights Manually](#Setting-the-lights-manually)
+[Setting the Lights Manually](#Setting-the-lights-manually)  
 [Updating the Software](#Updating-the-Software)  
 [Troubleshooting](#Troubleshooting-the-hardware)  
 [Common Issues](#Common-Issues)
