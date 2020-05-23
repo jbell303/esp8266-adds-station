@@ -22,11 +22,13 @@ Functionally, there are two electronic parts:
 
 ## Connecting via a web browser
 * Open a web browser and navigate to [http://weather.local/](http://weather.local/)
-* Note: the `weather.local` address uses mDNS and works best on iOS or Mac, Windows requires installation of Bonjour. Android is not supported.
+*Note: the `weather.local` address uses mDNS and works best on iOS or Mac, Windows requires installation of Bonjour. Android is not supported.
 * You can also connect via the local IP address (e.g. `192.168.x.x`)
 * To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen.
 
 ## Checking the weather
-* 
+Type the four-letter identifier of the airport you want to check and press `Fetch Weather`
+
+
 
 
