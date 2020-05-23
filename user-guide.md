@@ -11,7 +11,7 @@
 ## Getting Started
 #### Power Requirements
 * You must use the DC 5V adapter to power the sign or the lights won't turn on.  
-* A micro USB cable can be used to power the ESP8266 microcontroller in order to upload an new sketch.
+* [Software Updates](#Updating-the-Software): A micro USB cable can be used to power the ESP8266 microcontroller in order to upload an new sketch.
 
 #### WiFi
 * The sign **must be connected to WiFi** for the lights to turn on, even with the manual toggle button.
