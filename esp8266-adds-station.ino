@@ -20,6 +20,11 @@ String cloud_base = "";
 int wind_speed = 0;
 String ceiling = "";
 
+#define MIN_CEILING 3000;
+#define MAX_WIND_SPEED 25;
+int min_ceiling = MIN_CEILING;
+int max_wind_speed = MAX_WIND_SPEED;
+
 ESP8266WebServer server(80);
 AutoConnect Portal(server);
 AutoConnectConfig config;
@@ -101,6 +106,7 @@ static const char html_1[] PROGMEM = R"=====(
         document.getElementById("identifier").value = response.identifier;
         document.getElementById("flight_category").innerHTML = response.flight_category;
         document.getElementById("ceiling").innerHTML = response.ceiling;
+        document.getElementById("visibility").innerHTML = response.visibility;
         document.getElementById("wind_speed").innerHTML = response.wind_speed;
         document.getElementById("submit_button").value = "Fetch Weather";
         document.getElementById("toggle_button").value = (response.isDrinkingWeather ? "Set Flying Weather" : "Set Drinking Weather");
@@ -232,6 +238,9 @@ div {
         <td class="data" id="ceiling"></td>
       </tr>
       <tr>
+        <td class="label">Visibility: </td>
+        <td class="data" id="visibility"></td>
+      <tr>
         <td class="label">Wind Speed: </td>
         <td class="data" id="wind_speed"></td>
       </tr>   
@@ -277,7 +286,7 @@ String getValueforParameter(String line, String param) {
 }
 
 bool isDrinkingWeather(String flight_category, int wind_speed, String ceiling) {
-  if (flight_category == "IFR" || flight_category == "LIFR" || ceiling.toInt() < 3000 || wind_speed > 25) {
+  if (flight_category == "IFR" || flight_category == "LIFR" || ceiling.toInt() < min_ceiling || wind_speed > max_wind_speed) {
     setDrinkingWeatherLights();
     return true;
   }
@@ -317,24 +326,27 @@ void fetchWeather() {
      Serial.println("[Response:]");
 
      // parse the server response
+     ceiling = "50000"; //initialize ceiling to a high value
+     String base = "";
+     String line = "";
+     String lineValue = "";
      while (client.connected() || client.available()){
         if (client.available()){
-          String line = client.readStringUntil('\r');
+          line = client.readStringUntil('\r');
 //          Serial.println(line);
-          String value = getValueforTag(line, "flight_category");
-          if (value.length() > 0) {
-            flight_category = value;
+          lineValue = getValueforTag(line, "flight_category");
+          if (lineValue.length() > 0) {
+            flight_category = lineValue;
           }
-          value = getValueforTag(line, "visibility_statute_mi");
-          if (value.length() > 0) {
-            visibility = value;
+          lineValue = getValueforTag(line, "visibility_statute_mi");
+          if (lineValue.length() > 0) {
+            visibility = lineValue;
           }
           // get the sky cover and cloud base
-          value = getValueforParameter(line, "sky_cover");
-          if (value.length() > 0) {
-            sky_cover = value;
-            String base = getValueforParameter(line, "cloud_base_ft_agl");
-            ceiling = "50000"; //initialize celing to a high value
+          lineValue = getValueforParameter(line, "sky_cover");
+          if (lineValue.length() > 0) {
+            sky_cover = lineValue;
+            base = getValueforParameter(line, "cloud_base_ft_agl");
             // if the sky cover is broken or overcast, we have a ceiling
             if (sky_cover == "BKN" || sky_cover == "OVC") {
               if (base.length() > 0) {
@@ -347,9 +359,9 @@ void fetchWeather() {
               cloud_base = base;
             }
           }
-          value = getValueforTag(line, "wind_speed_kt");
-          if (value.length() > 0) {
-            wind_speed = value.toInt();
+          lineValue = getValueforTag(line, "wind_speed_kt");
+          if (lineValue.length() > 0) {
+            wind_speed = lineValue.toInt();
           }
         }
      } 
@@ -399,12 +411,13 @@ void handleWeatherForm() {
       fetchWeather();
       
       // serialize response to JSON 
-      const size_t capacity = JSON_OBJECT_SIZE(7);
+      const size_t capacity = JSON_OBJECT_SIZE(9);
       DynamicJsonDocument doc(capacity);
     
       doc["identifier"] = identifier;
       doc["flight_category"] = flight_category;
       doc["ceiling"] = (ceiling.toInt() >= 50000 ? "None" : ceiling + " feet");
+      doc["visibility"] = visibility + " mi";
       doc["wind_speed"] = String(wind_speed) + " knots";
       doc["isDrinkingWeather"] = isDrinkingWeather(flight_category, wind_speed, ceiling);
 
@@ -468,7 +481,7 @@ void setup(void) {
           WiFi.localIP().toString());
 
   // start MDNS server
-  if (MDNS.begin("weather")) {
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
