@@ -1,5 +1,9 @@
 # User Guide
-[Powering On](#Powering-On)
+[Powering On](#Powering-On)  
+[Connecting to WiFi](#Connecting-to-WiFi-using-AutoConnect)  
+[Connecting via a Web Browser](#Connecting-via-a-web-browser)  
+[Updating the Software](#Updating-the-Software-(Arduino-sketch))  
+[Troubleshooting](#Troubleshooting-the-hardware)  
 
 
 ## Powering On
@@ -101,7 +105,7 @@ Functionally, there are two electronic parts:
 #### The unit won't turn on: 
 Plug in the sign using the wall adapter. Check to see if any lights blink on the ESP8266.  
 If there is a blinking amber light, the ESP8266 is getting power, but either:
-1. The ESP8266 isn't connected to WiFi. - Follow the [autoconnect](Connecting-to-WiFi-using-AutoConnect) instructions.
+1. The ESP8266 isn't connected to WiFi. - Follow the [autoconnect](#Connecting-to-WiFi-using-AutoConnect) instructions.
 2. The NeoPixels aren't getting power - Check the connections to the NeoPixels. The `red` wire should be connected directly to the 5V DC power jack.  
 ![dc_jack](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/dc_jack.png)
 You can test the lights manually with the button on the back of the sign.
