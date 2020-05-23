@@ -14,6 +14,9 @@ Functionally, there are two electronic parts:
 * The ESP8266 **must be connected to WiFi** for the lights to turn on, even with the manual toggle button.
 * If the sign is powered on and successully connects to WiFi, it will grab the weather for KNFL from ADDS and turn the lights on automatically.
 
+#### Connecting to WiFi using AutoConnect
+Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html) starting at the `Run at first` step. Skip the first section about loading a sketch.
+
 ### Weather Update Cylce 
 * The ESP8266 grabs the current METAR once per minute.
 
@@ -86,10 +89,16 @@ There are two ways to upload the sketch:
 * There is a parts list and wiring schematic in the [README](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/README.md).
 
 ### Common Issues
-* The unit won't turn on: Plug in the sign using the wall adapter. Check to see if any lights blink on the ESP8266.
+#### The unit won't turn on: 
+Plug in the sign using the wall adapter. Check to see if any lights blink on the ESP8266.  
 If there is a blinking amber light, the ESP8266 is getting power, but either:
-1. The NeoPixels aren't getting power OR
-2. The ESP8266 isn't connecting to WiFi
+1. The ESP8266 isn't connected to WiFi. - Follow the [autoconnect](Connecting-to-WiFi-using-AutoConnect) instructions.
+2. The NeoPixels aren't getting power - Check the connections to the NeoPixels. The `red` wire should be connected directly to the 5V DC power jack.  
+You can test the lights manually with the button on the back of the sign.
+
+#### I can't access the webpage:
+Check that the board is connected to [WiFi](Connecting-to-WiFi-using-AutoConnect)  
+Try to access the page using the local [IP](Connecting-via-a-web-browser)
 
 
 
