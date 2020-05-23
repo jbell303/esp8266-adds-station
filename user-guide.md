@@ -1,11 +1,6 @@
 # User Guide
+[Powering On](#Powering-On)
 
-## Parts
-Functionally, there are two electronic parts:  
-1. The ESP8266 microcontroller (i.e. the computer)  
-![electronics](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/electronics.png)
-2. The NeoPixels (i.e. the lights)  
-![neopixel-frame](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/frame_open.png)
 
 ## Powering On
 ### Requirements
@@ -73,6 +68,13 @@ There are two ways to upload the sketch:
 * At the top-right of the Autoconnect menu, click on `Update`.
 * Click on `Choose File...` and select the binary `.bin` file created earlier.
 * Click `Update`. Once the firmware is done updating, the board will reset automatically, there should be no need to refresh the browser.
+
+## Parts
+Functionally, there are two electronic parts:  
+1. The ESP8266 microcontroller (i.e. the computer)  
+![electronics](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/electronics.png)
+2. The NeoPixels (i.e. the lights)  
+![neopixel-frame](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/frame_open.png)
 
 ## Troubleshooting the hardware
 ### Opening the frame
