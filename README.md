@@ -2,6 +2,9 @@
 Uses the ESP8266 to query Aviation Digital Data Service (aviationweather.gov/adds) to display current weather status with Adafruit NeoPixels
 
 ![animation](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/sign_animation.gif)
+## Getting Started
+See the [User Guide](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/user-guide.md)
+
 ## Requirements
 ### Hardware
 * [Adafruit ESP8266 Feather HUZZAH with headers](https://www.adafruit.com/product/3046)
