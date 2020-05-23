@@ -7,15 +7,15 @@
 
 
 ## Getting Started
-### Power Requirements
+#### Power Requirements
 * You must use the DC 5V adapter to power the NeoPixels.  
 * A micro USB cable can be used to power the ESP8266 microcontroller in order to upload an new sketch.
 
-### WiFi
+#### WiFi
 * The ESP8266 **must be connected to WiFi** for the lights to turn on, even with the manual toggle button.
 * If the sign is powered on and successully connects to WiFi, it will grab the weather for KNFL from ADDS and turn the lights on automatically.
 
-#### Connecting to WiFi using AutoConnect
+### Connecting to WiFi using AutoConnect
 Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html) starting at the `Run at first` step. Skip the first section about loading a sketch.
 
 ### Weather Update Cylce 
