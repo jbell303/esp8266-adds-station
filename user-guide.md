@@ -3,7 +3,9 @@
 ## Parts
 Functionally, there are two electronic parts:  
 1. The ESP8266 microcontroller (i.e. the computer)  
-2. The NeoPixels (i.e. the lights)
+![electronics](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/electronics.png)
+2. The NeoPixels (i.e. the lights)  
+![neopixel-frame](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/frame_open.png)
 
 ## Powering On
 ### Requirements
@@ -79,10 +81,14 @@ There are two ways to upload the sketch:
 * Carefully lift the edge where the power cord is sticking out.
 * Disconnect the two JST connectors connecting the NeoPixels.  
 ![jst connectors](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/jst.png)
-* Open the lid like a book cover, being careful not to damage the Neopixel connections on the left edge.
+* Open the lid like a book cover, being careful not to damage the Neopixel connections on the left edge.  
+![neopixels](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/neopixel.png)
+![open-frame](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/frame_open.png)
+
 
 ### Removing the ESP8266
-* Take note of the wiring, use a screwdriver to loosen the connections to the terminal block if required.
+* Take note of the wiring, use a screwdriver to loosen the connections to the terminal block if required.  
+![electronics](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/electronics.png)
 * Remove the electronics assembly from the housing on the frame.
 
 ### Fixing or replacing hardware
@@ -95,6 +101,7 @@ Plug in the sign using the wall adapter. Check to see if any lights blink on the
 If there is a blinking amber light, the ESP8266 is getting power, but either:
 1. The ESP8266 isn't connected to WiFi. - Follow the [autoconnect](Connecting-to-WiFi-using-AutoConnect) instructions.
 2. The NeoPixels aren't getting power - Check the connections to the NeoPixels. The `red` wire should be connected directly to the 5V DC power jack.  
+![dc_jack](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/dc_jack.png)
 You can test the lights manually with the button on the back of the sign.
 
 #### I can't access the webpage:
