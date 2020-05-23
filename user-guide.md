@@ -2,7 +2,7 @@
 [Getting Started](#Getting-Started)  
 [Connecting to WiFi](#Connecting-to-WiFi-using-AutoConnect)  
 [Connecting via a Web Browser](#Connecting-via-a-web-browser)  
-[Updating the Software](#Updating-the-Software-(Arduino-sketch))  
+[Updating the Software](#Updating-the-Software)  
 [Troubleshooting](#Troubleshooting-the-hardware)  
 [Common Issues](#Common-Issues)
 
@@ -40,12 +40,13 @@ Type the four-letter identifier of the airport you want to check and press ![Fet
 * Ceiling < 3000' AGL  
 * Wind Speed > 25 knots  
 
-*To change these parameters see [Updating the Software](#Updating-the-Software-(Arduino-sketch))*
+*To change these parameters see [Updating the Software](#Updating-the-Software)*
 
 ## Setting 'Flying Weather' or 'Drinking Weather' via a web browser
 Press the ![Set Flying Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fly_button.PNG) or ![Set Drinking Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/drink_button.PNG) button on the screen to toggle the lights.
 
-## Updating the Software (Arduino sketch)
+## Updating the Software  
+<img src=https://3dprint.com/wp-content/uploads/2015/06/3dp_hexapod_arduino_logo.png alt="Arduino Logo" width="100" height="100"></img>  
 ### 1. Clone this Repo
 Using  `terminal` on a Mac, or `CMD` in Windows, navigate to the directory you want to install the software and type: 
 ```
@@ -136,7 +137,7 @@ Try to access the page using the local [IP](#Connecting-via-a-web-browser)
 
 #### The weather won't update
 It is possible that the [SHA-1 fingerprint](https://en.wikipedia.org/wiki/Public_key_fingerprint) of `aviationweather.gov` has changed.  
-Follow [this](https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/client-secure-examples.html#how-to-verify-server-s-identity) guide to find the new fingerprint and [update](#Updating-the-Software-(Arduino-sketch)) the value of `fingerprint` in `esp8266-adds-station.ino`.
+Follow [this](https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/client-secure-examples.html#how-to-verify-server-s-identity) guide to find the new fingerprint and [update](#Updating-the-Software) the value of `fingerprint` in `esp8266-adds-station.ino`.
 
 
 
