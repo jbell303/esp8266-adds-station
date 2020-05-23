@@ -133,7 +133,7 @@ You can test the lights manually with the button on the back of the sign.
 Check that the board is connected to [WiFi](#Connecting-to-WiFi-using-AutoConnect)  
 Try to access the page using the local [IP](#Connecting-via-a-web-browser)
 
-### The weather won't update
+#### The weather won't update
 It is possible that the [SHA-1 fingerprint](https://en.wikipedia.org/wiki/Public_key_fingerprint) of `aviationweather.gov` has changed.  
 Follow [this](https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/client-secure-examples.html#how-to-verify-server-s-identity) guide to find the new fingerprint and [update](#Updating-the-Software-(Arduino-sketch)) the value of `fingerprint` in `esp8266-adds-station.ino`.
 
