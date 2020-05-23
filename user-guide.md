@@ -23,7 +23,7 @@ Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html#r
 
 ### Checking the weather via a web browser  
 * Open a web browser and navigate to [http://weather.local/](http://weather.local/)  
-*Note: the `weather.local` address uses [mDNS](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266mDNS) and works best on iOS or Mac, Windows requires installation of [Bonjour](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US). Android is not supported.*  
+*Note: the `weather.local` address uses [mDNS](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266mDNS) and works best on iOS or Mac. Windows requires installation of [Bonjour](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US). Android is not supported.*  
 * You can also connect via the local IP address (e.g. `192.168.x.x`)  
 * To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen. 
 ![screenshot](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/wx_screen.PNG) 
