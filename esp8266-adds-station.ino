@@ -6,13 +6,20 @@
 #include <AutoConnect.h>
 #include <Adafruit_NeoPixel.h>
 
-// ADDS 
+// initialize webserver
+ESP8266WebServer server(80);
+AutoConnect Portal(server);
+AutoConnectConfig config;
+const char mdns_name[] PROGMEM = "weather"; // .local
+
+// initialize ADDS parameters
 const char* host = "aviationweather.gov";
 const int httpsPort = 443;
 const char fingerprint[] PROGMEM = "07e32864918f4238a0542a2ccdc17c98798ca1d8";
 String identifier = "KNFL";
 String url = "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
 
+// initialize METAR data
 String flight_category = "";
 String visibility = "";
 String sky_cover = "";
@@ -25,55 +32,47 @@ String ceiling = "";
 int min_ceiling = MIN_CEILING;
 int max_wind_speed = MAX_WIND_SPEED;
 
-ESP8266WebServer server(80);
-AutoConnect Portal(server);
-AutoConnectConfig config;
-
 // intitialize timer for auto updates
 bool timerActive;
 
-// NeoPixels
+// initialize NeoPixels
 #define LED_PIN    5
 #define LED_COUNT  100
-
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-
-// button
-const int buttonPin = 13; // button for manual toggle
 uint32_t green_strip = 0; // for color evaluation
 uint32_t red_strip = 0;
 
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// initialize button parameters
+const int buttonPin = 13; // button for manual toggle
+
+// set the lights for flying weather
 void setFlyingWeatherLights () {
   strip.clear();
-  strip.fill(strip.Color(255, 255, 255), 0, 25); // left strip
-  strip.fill(strip.Color(0, 255, 0), 25, 25); // top strip
-  strip.fill(strip.Color(255, 255, 255), 50, 24); // right strip
-  strip.fill(strip.Color(0, 0, 0), 74, 26); // bottom strip
+  strip.fill(strip.Color(255, 255, 255), 0, 25); // left strip white
+  strip.fill(strip.Color(0, 255, 0), 25, 25); // top strip green
+  strip.fill(strip.Color(255, 255, 255), 50, 24); // right strip white
+  strip.fill(strip.Color(0, 0, 0), 74, 26); // bottom strip off
   strip.show();
 }
 
+// set the lights for drinking weather
 void setDrinkingWeatherLights () {
   strip.clear();
-  strip.fill(strip.Color(255, 255, 255), 0, 25);
-  strip.fill(strip.Color(0, 0, 0), 25, 25);
-  strip.fill(strip.Color(255, 255, 255), 50, 24);
-  strip.fill(strip.Color(255, 0, 0), 74, 26);
+  strip.fill(strip.Color(255, 255, 255), 0, 25); // left white
+  strip.fill(strip.Color(0, 0, 0), 25, 25); // top off
+  strip.fill(strip.Color(255, 255, 255), 50, 24); // right white
+  strip.fill(strip.Color(255, 0, 0), 74, 26); // bottom red
   strip.show();
 }
 
-// html and javascript
+// load html, css and javascript to progmem
 static const char html_1[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
   <head>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
   <meta charset='utf-8'>
-  <style>
-    body {font-size:140%;}
-    #main {display: table; margin: auto; padding: 0 10px 0 10px; }
-    h2 {text-align:center; }
-    #LED_button { padding:10px 10px 10px 10px; width:100%; background-color: #50FF50; font-size: 120%;}
-   </style>
 
 <script>
   // set the button text to a pending status
@@ -178,8 +177,14 @@ static const char html_1[] PROGMEM = R"=====(
 </head>
 
  <style type="text/css">
+    #main {display: table; 
+    margin: auto; 
+    padding: 0 10px 0 10px; 
+    }
+    h2 {text-align:center; }
     body {
    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+   font-size:140%;
 }
 
 .label {
@@ -481,7 +486,7 @@ void setup(void) {
           WiFi.localIP().toString());
 
   // start MDNS server
-  if (MDNS.begin("esp8266")) {
+  if (MDNS.begin(mdns_name)) {
     Serial.println("MDNS responder started");
   }
 
