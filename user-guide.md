@@ -107,8 +107,8 @@ If there is a blinking amber light, the ESP8266 is getting power, but either:
 You can test the lights manually with the button on the back of the sign.
 
 #### I can't access the webpage:
-Check that the board is connected to [WiFi](Connecting-to-WiFi-using-AutoConnect)  
-Try to access the page using the local [IP](Connecting-via-a-web-browser)
+Check that the board is connected to [WiFi](#Connecting-to-WiFi-using-AutoConnect)  
+Try to access the page using the local [IP](#Connecting-via-a-web-browser)
 
 
 
