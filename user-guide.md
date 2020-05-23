@@ -44,7 +44,8 @@ Type the four-letter identifier of the airport you want to check and press ![Fet
 Press the ![Set Flying Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fly_button.PNG) or ![Set Drinking Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/drink_button.PNG) button on the screen to toggle the lights.
 
 ### Setting the lights manually
-The sign can be cycled through `Drinking Weather` -> `Flying Weather` -> `OFF` with the button on the back of the frame.
+The sign can be cycled through `Drinking Weather` -> `Flying Weather` -> `OFF` with the button on the back of the frame.  
+*Note: the sign must be connected to WiFi*
 
 ## Updating the Software  
 <img src=https://3dprint.com/wp-content/uploads/2015/06/3dp_hexapod_arduino_logo.png alt="Arduino Logo" width="100" height="95"></img>  
