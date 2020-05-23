@@ -77,7 +77,8 @@ There are two ways to upload the sketch:
 * Unplug the unit and place it face-down on a table.
 * Pivot the latches so the back of the frame can be removed.
 * Carefully lift the edge where the power cord is sticking out.
-* Disconnect the two JST connectors connecting the NeoPixels.
+* Disconnect the two JST connectors connecting the NeoPixels.  
+![jst connectors](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/jst.png)
 * Open the lid like a book cover, being careful not to damage the Neopixel connections on the left edge.
 
 ### Removing the ESP8266
