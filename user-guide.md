@@ -59,11 +59,38 @@ Be sure to save your work.
 
 ### 7. Upload the new sketch to the ESP8266
 There are two ways to upload the sketch:  
-1. Using a micro-USB cable. The previous [guide](https://learn.adafruit.com/adafruit-io-basics-esp8266-arduino/using-arduino-ide) covers how to upload a sketch in Arduino using a USB cable.
-2. Over the Air (OTA)  
+1. **Using a micro-USB cable**. The previous [guide](https://learn.adafruit.com/adafruit-io-basics-esp8266-arduino/using-arduino-ide) covers how to upload a sketch in Arduino using a USB cable.
+
+2. **Over the Air (OTA)** 
 * To update a sketch OTA, the sketch first has to be compiled to a binary. In Arduino, go to `Sketch -> Export compiled binary` to build the sketch. Once finished, there should be a `.bin` file in the same directory as the `.ino` skech file.
 * Using a web browser, navigate to `weather.local` or the local IP of the ESP8266.
 * At the botton of the screen there is a `gear icon`. Click on it to go to the Autoconnect menu.
+* At the top-right of the Autoconnect menu, click on `Update`.
+* Click on `Choose File...` and select the binary `.bin` file created earlier.
+* Click `Update`. Once the firmware is done updating, the board will reset automatically, there should be no need to refresh the browser.
+
+## Troubleshooting the hardware
+### Opening the frame
+* Unplug the unit and place it face-down on a table.
+* Pivot the latches so the back of the frame can be removed.
+* Carefully lift the edge where the power cord is sticking out.
+* Disconnect the two JST connectors connecting the NeoPixels.
+* Open the lid like a book cover, being careful not to damage the Neopixel connections on the left edge.
+
+### Removing the ESP8266
+* Take note of the wiring, use a screwdriver to loosen the connections to the terminal block if required.
+* Remove the electronics assembly from the housing on the frame.
+
+### Fixing or replacing hardware
+* The ESP8266 can be pulled out of the electronics assembly without tools.
+* There is a parts list and wiring schematic in the [README](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/README.md).
+
+### Common Issues
+* The unit won't turn on: Plug in the sign using the wall adapter. Check to see if any lights blink on the ESP8266.
+If there is a blinking amber light, the ESP8266 is getting power, but either:
+1. The NeoPixels aren't getting power OR
+2. The ESP8266 isn't connecting to WiFi
+
 
 
 
