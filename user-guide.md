@@ -46,7 +46,7 @@ Type the four-letter identifier of the airport you want to check and press ![Fet
 Press the ![Set Flying Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fly_button.PNG) or ![Set Drinking Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/drink_button.PNG) button on the screen to toggle the lights.
 
 ## Updating the Software  
-<img src=https://3dprint.com/wp-content/uploads/2015/06/3dp_hexapod_arduino_logo.png alt="Arduino Logo" width="100" height="100"></img>  
+<img src=https://3dprint.com/wp-content/uploads/2015/06/3dp_hexapod_arduino_logo.png alt="Arduino Logo" width="100" height="95"></img>  
 ### 1. Clone this Repo
 Using  `terminal` on a Mac, or `CMD` in Windows, navigate to the directory you want to install the software and type: 
 ```
