@@ -1,7 +1,8 @@
 # User Guide
 [Getting Started](#Getting-Started)  
 [Connecting to WiFi](#Connecting-to-WiFi-using-AutoConnect)  
-[Connecting via a Web Browser](#Connecting-via-a-web-browser)  
+[Checking the Weather via a Web Browser](#Checking-the-weather-via-a-web-browser)  
+[Setting the Lights Manually](#Setting-the-lights-manually)
 [Updating the Software](#Updating-the-Software)  
 [Troubleshooting](#Troubleshooting-the-hardware)  
 [Common Issues](#Common-Issues)
@@ -19,21 +20,18 @@
 ### Connecting to WiFi using AutoConnect
 Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html#run-at-first) to connect the board to a new access point using your phone.
 
-### Weather Update Cylce 
-* The ESP8266 grabs the current METAR once per minute.
-
-### Setting the lights manually
-* The sign can be cycled through Drinking Weather -> Flying Weather -> OFF with the button on the back of the frame.
-
-## Connecting via a web browser  
+## Checking the weather via a web browser  
 * Open a web browser and navigate to [http://weather.local/](http://weather.local/)  
 *Note: the `weather.local` address uses [mDNS](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266mDNS) and works best on iOS or Mac, Windows requires installation of [Bonjour](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US). Android is not supported.*  
 * You can also connect via the local IP address (e.g. `192.168.x.x`)  
 * To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen. 
 ![screenshot](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/wx_screen.PNG) 
 
-## Checking the weather
+## Fetching the weather
 Type the four-letter identifier of the airport you want to check and press ![Fetch Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fetch_button.PNG). 
+
+### Weather Update Cylce 
+* The ESP8266 grabs the current METAR once per minute.
 
 ## Drinking Weather Parameters
 * IFR or LIFR  
@@ -44,6 +42,9 @@ Type the four-letter identifier of the airport you want to check and press ![Fet
 
 ## Setting 'Flying Weather' or 'Drinking Weather' via a web browser
 Press the ![Set Flying Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fly_button.PNG) or ![Set Drinking Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/drink_button.PNG) button on the screen to toggle the lights.
+
+### Setting the lights manually
+The sign can be cycled through `Drinking Weather` -> `Flying Weather` -> `OFF` with the button on the back of the frame.
 
 ## Updating the Software  
 <img src=https://3dprint.com/wp-content/uploads/2015/06/3dp_hexapod_arduino_logo.png alt="Arduino Logo" width="100" height="95"></img>  
@@ -57,7 +58,7 @@ git clone https://github.com/jbell303/esp8266-weather-station-with-neopixels.git
 ### 2. Install Arduino 
 Navigate to [https://www.arduino.cc](https://www.arduino.cc) and install Arduino.
 
-### 3. Install the necessary ESP8266 drivers and packages
+### 3. Install the necessary ESP8266 drivers and package
 Use [this guide](https://learn.adafruit.com/adafruit-io-basics-esp8266-arduino/using-arduino-ide) to add the ESP8266 to Arduino.
 
 ### 4. Install the required libraries
