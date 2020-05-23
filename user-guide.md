@@ -25,11 +25,11 @@ Follow [this guide](https://hieromon.github.io/AutoConnect/gettingstarted.html) 
 * The sign can be cycled through Drinking Weather -> Flying Weather -> OFF with the button on the back of the frame.
 
 ## Connecting via a web browser  
-![screenshot](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/wx_screen.PNG)  
 * Open a web browser and navigate to [http://weather.local/](http://weather.local/)  
 *Note: the `weather.local` address uses mDNS and works best on iOS or Mac, Windows requires installation of [Bonjour](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US). Android is not supported.*  
 * You can also connect via the local IP address (e.g. `192.168.x.x`)  
-* To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen.  
+* To find the local IP, navigate to [weather.local](http://weather.local/) on an iOS or Mac and check the local IP at the bottom of the screen. 
+![screenshot](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/wx_screen.PNG) 
 
 ## Checking the weather
 Type the four-letter identifier of the airport you want to check and press ![Fetch Weather](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/fetch_button.PNG). 
@@ -87,11 +87,12 @@ There are two ways to upload the sketch:
 2. **Over the Air (OTA)** 
 * To update a sketch OTA, the sketch first has to be compiled to a binary. In Arduino, go to `Sketch -> Export compiled binary` to build the sketch. Once finished, there should be a `.bin` file in the same directory as the `.ino` skech file.
 * Using a web browser, navigate to `weather.local` or the local IP of the ESP8266.
-* At the botton of the screen there is a `gear icon`. Click on it to go to the Autoconnect menu.
+* Click on the ![gear icon](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/gear.PNG) at the botton of the screen to go to the Autoconnect menu.
 * At the top-right of the Autoconnect menu, click on `Update`.
 * Click on `Choose File...` and select the binary `.bin` file created earlier.
 * Click `Update`. Once the firmware is done updating, the board will reset automatically, there should be no need to refresh the browser.
 
+## Troubleshooting the hardware
 ## Parts
 Functionally, there are two electronic parts:  
 1. The ESP8266 microcontroller (i.e. the computer)  
@@ -99,7 +100,6 @@ Functionally, there are two electronic parts:
 2. The NeoPixels (i.e. the lights)  
 ![neopixel-frame](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/frame_open.png)
 
-## Troubleshooting the hardware
 ### Opening the frame
 * Unplug the unit and place it face-down on a table.
 * Pivot the latches so the back of the frame can be removed.
@@ -132,6 +132,10 @@ You can test the lights manually with the button on the back of the sign.
 #### I can't access the webpage:
 Check that the board is connected to [WiFi](#Connecting-to-WiFi-using-AutoConnect)  
 Try to access the page using the local [IP](#Connecting-via-a-web-browser)
+
+### The weather won't update
+It is possible that the [SHA-1 fingerprint](https://en.wikipedia.org/wiki/Public_key_fingerprint) of `aviationweather.gov` has changed.  
+Follow [this](https://arduino-esp8266.readthedocs.io/en/latest/esp8266wifi/client-secure-examples.html#how-to-verify-server-s-identity) guide to find the new fingerprint and [update](#Updating-the-Software-(Arduino-sketch)) the value of `fingerprint` in `esp8266-adds-station.ino`.
 
 
 
