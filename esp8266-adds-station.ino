@@ -1,31 +1,37 @@
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+ #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 #include <AutoConnect.h>
 #include <Adafruit_NeoPixel.h>
+#include "html.h"
+//#include "cert.h"
 
 // initialize webserver
 ESP8266WebServer server(80);
 AutoConnect Portal(server);
 AutoConnectConfig config;
-const char mdns_name[] PROGMEM = "weather"; // .local
+// const char mdns_name[] PROGMEM = "weather"; // .local
 
 // initialize ADDS parameters
-const char* host = "aviationweather.gov";
-const int httpsPort = 443;
-const char fingerprint[] PROGMEM = "07e32864918f4238a0542a2ccdc17c98798ca1d8";
-String identifier = "KNFL";
-String url = "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
+const char* adds_host = "aviationweather.gov";
+const uint16_t port = 443;
+//X509List cert(cert_DigiCert_Global_Root_CA);
+//String url = "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
+const char url[] PROGMEM = "/api/data/dataserver?requestType=retrieve&dataSource=metars&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=";
+
+// initialize BearSSL client
+WiFiClientSecure client;
 
 // initialize METAR data
-String flight_category = "";
-String visibility = "";
-String sky_cover = "";
-String cloud_base = "";
+char identifier[5] = "KNFL";
+char flight_category[5];
+char visibility[10];
+char sky_cover[10];
+char cloud_base[10];
 int wind_speed = 0;
-String ceiling = "";
+int ceiling = 50000;
 
 #define MIN_CEILING 3000;
 #define MAX_WIND_SPEED 25;
@@ -66,232 +72,75 @@ void setDrinkingWeatherLights () {
   strip.show();
 }
 
-// load html, css and javascript to progmem
-static const char html_1[] PROGMEM = R"=====(
-<!DOCTYPE html>
-<html>
-  <head>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-  <meta charset='utf-8'>
-
-<script>
-  // set the button text to a pending status
-  // read the station id from the form and use it in our request URL
-  function fetchWeather() {
-    document.getElementById("submit_button").value = "Fetching weather...";
-    station_id = document.getElementById("identifier").value;
-    ajaxLoad(station_id);
+// parses XML data values based on tag provided
+void getValueForTag(const char* line, const char* tag, char* value, int valueSize) {
+  // Find the starting index of the tag
+  const char* tagStart = strstr(line, tag);
+  if (tagStart == nullptr) {
+    value[0] = '\0'; // Empty string if tag is not found
+    return;
   }
 
-  // initialize ajax request object
-  var ajaxRequest = null;
-  if (window.XMLHttpRequest) { ajaxRequest = new XMLHttpRequest(); }
-                           { ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP"); }
-
-  // send a POST request to the server with station ID
-  // parse the response and display the values in HTML
-  function ajaxLoad(station_id) {
-    if (!ajaxRequest) {
-      alert("AJAX is not supported.");
-      return;
-    }
-
-    ajaxRequest.open("POST", "station_id/", true);
-    ajaxRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    ajaxRequest.send("station_id=" + station_id);
-    ajaxRequest.onreadystatechange = function () {
-      if (ajaxRequest.readyState == 4 && ajaxRequest.status == 200) {
-        var response = JSON.parse(ajaxRequest.responseText);
-        document.getElementById("identifier").value = response.identifier;
-        document.getElementById("flight_category").innerHTML = response.flight_category;
-        document.getElementById("ceiling").innerHTML = response.ceiling;
-        document.getElementById("visibility").innerHTML = response.visibility;
-        document.getElementById("wind_speed").innerHTML = response.wind_speed;
-        document.getElementById("submit_button").value = "Fetch Weather";
-        document.getElementById("toggle_button").value = (response.isDrinkingWeather ? "Set Flying Weather" : "Set Drinking Weather");
-        document.getElementById("toggle_button").style.backgroundColor = (response.isDrinkingWeather ? "#4CAF50" : "#FF0000");
-      }
-    }
-    ajaxRequest.send();
+  // Find the starting index of the tag value
+  const char* valueStart = strchr(tagStart, '>') + 1;
+  if (valueStart == nullptr) {
+    value[0] = '\0'; // Empty string if value is not found
+    return;
   }
 
-  // manually toggle flying weather and drinking weather lights
-  // change the button text based on the desired state
-  // send the LED toggle request to the server
-  function toggleLed () {
-    var button_text = document.getElementById("toggle_button").value;
-    if (button_text == "Set Drinking Weather") {
-      document.getElementById("toggle_button").value = "Setting Drinking Weather";
-      document.getElementById("toggle_button").style.backgroundColor = "#4CAF50";
-      ajaxLED('DRINKING');
-    } else {
-      document.getElementById("toggle_button").value = "Setting Flying Weather";
-      document.getElementById("toggle_button").style.backgroundColor = "#FF0000";
-      ajaxLED('FLYING');
-    }
+  // Find the ending index of the tag value
+  const char* valueEnd = strstr(valueStart, "</");
+  if (valueEnd == nullptr) {
+    value[0] = '\0'; // Empty string if end tag is not found
+    return;
   }
 
-  function ajaxLED(ajaxURL) {
-    if (!ajaxRequest) {
-      alert("AJAX is not supported.");
-      return;
-    }
-
-    ajaxRequest.open("GET", ajaxURL, true);
-    ajaxRequest.onreadystatechange = function () {
-      if (ajaxRequest.readyState == 4 && ajaxRequest.status == 200) {
-        var ajaxResult = ajaxRequest.responseText;
-        if (ajaxResult == "Flying Weather") {
-          document.getElementById("toggle_button").value = "Set Drinking Weather";
-          document.getElementById("toggle_button").style.backgroundColor = "#FF0000";
-        } else if (ajaxResult == "Drinking Weather") {
-          document.getElementById("toggle_button").value = "Set Flying Weather";
-          document.getElementById("toggle_button").style.backgroundColor = "#4CAF50";
-        }
-      }
-    }
-    ajaxRequest.send();
+  // Calculate the length of the value
+  int valueLength = valueEnd - valueStart;
+  if (valueLength >= valueSize) {
+    valueLength = valueSize - 1; // Ensure it fits in the provided buffer
   }
 
-  // request the local IP address from the server
-  function getIpAddress() {
-    if (!ajaxRequest) {
-      alert("AJAX is not supported.");
-      return;
-    }
+  // Copy the value to the provided buffer
+  strncpy(value, valueStart, valueLength);
+  value[valueLength] = '\0'; // Null-terminate the string
+}
 
-    // display the local IP address in HTML
-    ajaxRequest.open("GET", "ip_address", true);
-    ajaxRequest.onreadystatechange = function () {
-      if (ajaxRequest.readyState == 4 && ajaxRequest.status == 200) {
-        var ajaxResult = ajaxRequest.responseText;
-        console.log(ajaxResult);
-        document.getElementById("ip_address").innerHTML = ajaxResult;
-      }
-    }
-    ajaxRequest.send();
+void getValueForParameter(const char* line, const char* param, char* value, int valueSize) {
+  // Find the starting index of the parameter
+  const char* paramStart = strstr(line, param);
+  if (paramStart == nullptr) {
+    value[0] = '\0'; // Empty string if parameter is not found
+    return;
   }
-</script>
 
-  <title>Saints Weather Station</title>
-</head>
-
- <style type="text/css">
-    #main {display: table; 
-    margin: auto; 
-    padding: 0 10px 0 10px; 
-    }
-    h2 {text-align:center; }
-    body {
-   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-   font-size:140%;
-}
-
-.label {
-  text-align: right;
-}
-
-.data {
-  padding-left: 10px;
-}
-    
-input[type=text], select {
-   width: 100%;
-   padding: 12px 20px;
-   margin: 8px 0;
-   display: inline-block;
-   border: 1px solid #ccc;
-   border-radius: 4px;
-   box-sizing: border-box;
-}
-
-input[type=button] {
-  -webkit-appearance: none;
-  width: 100%;
-  color: white;
-  padding: 10px 10px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-input[type=button] {
-  -webkit-appearance: none;
-  background-color: #45a049;
-}
-
-div {
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  padding: 20px;
-}
-    
-  </style>
-</head>
-<body onload="getIpAddress()">
-  <div id='main'>
-    
-    <h2>Saints Weather Station</h2>
-    <table>
-      <tr>
-        <td class="label">Flight Category: </td>
-        <td class="data" id="flight_category"></td>
-      </tr>
-      <tr>
-        <td class="label">Ceiling: </td>
-        <td class="data" id="ceiling"></td>
-      </tr>
-      <tr>
-        <td class="label">Visibility: </td>
-        <td class="data" id="visibility"></td>
-      <tr>
-        <td class="label">Wind Speed: </td>
-        <td class="data" id="wind_speed"></td>
-      </tr>   
-    </table>
-      <div>
-        <form class="form "action="javascript:fetchWeather()">
-          <label for="name">Identifier:</label>
-          <input type="text" id="identifier" name="station_id">
-          <input type="button" style="background-color:#4169E1" id="submit_button" onclick="fetchWeather()" value="Fetch Weather" />
-        </form>
-      </div>
-     <input class="button" type="button" id="toggle_button" style="background-color:#4CAF50;" onclick="toggleLed()" value="Set Flying Weather"/>
-  </div>
-  <p style="padding-top:15px;text-align:center">
-  <a href="/_ac"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAC2klEQVRIS61VvWsUQRSfmU2pon9BUIkQUaKFaCBKgooSb2d3NSSFKbQR/KrEIiIKBiGF2CgRxEpjQNHs7mwOUcghwUQ7g58IsbGxEBWsb2f8zR177s3t3S2cA8ftzPu993vzvoaSnMu2vRKlaqgKp74Q/tE8qjQPyHGcrUrRjwlWShmDbFMURd/a6TcQwNiYUmpFCPElUebcuQ2vz6aNATMVReHEPwzfSSntDcNwNo2rI+DcvQzhpAbA40VKyV0p1Q9snzBG1qYVcYufXV1sREraDcxpyHdXgkfpRBj6Uwm2RsC5dxxmZ9pdOY9cKTISRcHTCmGiUCh4fYyplTwG2mAUbtMTBMHXOgK9QfyXEZr+TkgQ1oUwDA40hEgfIAfj+HuQRaBzAs9eKyUZ5Htx+T3ZODKG8DzOJMANhmGomJVMXPll+hx9UUAlzZrJJ4QNCDG3VEfguu7mcpmcB/gkBOtShhQhchAlu5jlLUgc9ENgyP5gf9+y6LTv+58p5zySkgwzLNOIGc8sEoT1Lc53NMlbCQQuvMxeCME1NNPVVkmH/i3IzzXDtCSA0qQQwZWOCJDY50jsQRjJmkslEOxvTcDRO6zPxOh5xZglKkYLhWM9jMVnkIsTyMT6NBj7IbOCEjm6HxNVVTo2WXqEWJZ1T8rytB6GxizyDkPhWVpBqfiXUtbo/HywYJSpA9kMamNNPZ71R9Hcm+TMHHZNGw3EuraXEUldbfvw25UdOjqOt+JhMwJd7+jSTpZaEiIcaCDwPK83jtWnTkwnunFMtxeL/ge9r4XItt1RNNaj/0GAcV2bR3U5sG3nEh6M61US+Qrfd9Bs31GGulI2GOS/8dgcQZV1w+ApjIxB7TDwF9GcNzJzoA+rD0/8HvPnXQJCt2qFCwbBTfRI7UyXumWVt+HJ9NO4XI++bdsb0YyrqXmlh+AWOLHaLqS5CLQR5EggR3YlcVS9gKeH2hnX8r8Kmi1CAsl36QAAAABJRU5ErkJggg==" border="0" title="AutoConnect menu" alt="AutoConnect menu"/></a>
-</p>
-<p id="ip_address">192.168.x.x</p>
-</html>
-
-)=====";
-
-String getValueforTag(String line, String tag) {
-  String matchString;
-  if (line.endsWith("</" + tag + ">")) {
-    matchString = line;
-    int idx = matchString.indexOf(tag + ">");
-    int lineStart = idx + tag.length() + 1;
-    int lineEnd = matchString.indexOf("</" + tag + ">");
-    return matchString.substring(lineStart, lineEnd);
-  } else {
-    return "";
+  // Find the starting index of the parameter value
+  const char* valueStart = strchr(paramStart, '=') + 1;
+  if (valueStart == nullptr) {
+    value[0] = '\0'; // Empty string if value is not found
+    return;
   }
-}
 
-String getValueforParameter(String line, String param) {
-  int idx = line.indexOf(param + "=");
-  if (idx != -1) {
-    int paramStart = idx + param.length() + 2;
-    int paramEnd = line.indexOf('"', paramStart);
-    return line.substring(paramStart, paramEnd);
+  // Find the ending index of the parameter value
+  const char* valueEnd = strchr(valueStart, '"');
+  if (valueEnd == nullptr) {
+    value[0] = '\0'; // Empty string if end quote is not found
+    return;
   }
-  return "";
+
+  // Calculate the length of the value
+  int valueLength = valueEnd - valueStart;
+  if (valueLength >= valueSize) {
+    valueLength = valueSize - 1; // Ensure it fits in the provided buffer
+  }
+
+  // Copy the value to the provided buffer
+  strncpy(value, valueStart, valueLength);
+  value[valueLength] = '\0'; // Null-terminate the string
 }
 
-bool isDrinkingWeather(String flight_category, int wind_speed, String ceiling) {
-  if (flight_category == "IFR" || flight_category == "LIFR" || ceiling.toInt() < min_ceiling || wind_speed > max_wind_speed) {
+bool isDrinkingWeather(const char* flight_category, int wind_speed, int ceiling) {
+  if (flight_category == "IFR" || flight_category == "LIFR" || ceiling < min_ceiling || wind_speed > max_wind_speed) {
     setDrinkingWeatherLights();
     return true;
   }
@@ -301,84 +150,91 @@ bool isDrinkingWeather(String flight_category, int wind_speed, String ceiling) {
 
 void fetchWeather() {
   // Use WiFiClientSecure to create TLS connection
-  WiFiClientSecure client;
+  Serial.printf("\nConnecting to %s ...\n", adds_host);
 
-  Serial.printf("\nConnecting to %s ...", host);
-  Serial.print("\nFetching weather for...");
-  Serial.println(identifier);
+  // connect using root certificate
+//   Serial.printf("Using certificate: %s\n", cert_DigiCert_Global_Root_CA);
+//   client.setTrustAnchors(&cert);
+   client.setInsecure();
 
-  // initialize SHA-256 fingerprint
-  Serial.printf("Using fingerprint '%s'\n", fingerprint);
-  client.setFingerprint(fingerprint);
+  // debug: get the free heap
+  Serial.print("[FetchWeather()] Free heap is: ");
+  Serial.println(ESP.getFreeHeap());
+
+  // set buffer sizes
+  client.setBufferSizes(1024, 1024);
 
   // connect to host
-  if (!client.connect(host, httpsPort)) {
+  if (!client.connect(adds_host, port)) {
     Serial.println("connection failed");
     return;
   }
   
   Serial.println("connected");
   
+  Serial.print("\nFetching weather for...");
+  Serial.println(identifier);
   Serial.println("[Sending a request]");
-     client.print(String("GET ") + url + identifier + " HTTP/1.1\r\n" +
-                  "Host: " + host + "\r\n" +
-                  "User-Agent: BuildFailureDetectorESP8266\r\n" +
-                  "Connection: close\r\n" +
-                  "\r\n"
-                  );
+  
+  // Construct the request message
+  const char* getRequestTemplate = "GET %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: WeatherFetcherESP8266\r\nConnection: close\r\n\r\n";
+  char getRequest[strlen(url) + strlen(identifier) + strlen(adds_host) + strlen(getRequestTemplate)];
+  sprintf(getRequest, getRequestTemplate, url, identifier, adds_host);
+  client.print(getRequest);
 
-     // debug response to console
-     Serial.println("[Response:]");
+  // debug response to console
+  Serial.println("[Response:]");
 
-     // parse the server response
-     ceiling = "50000"; //initialize ceiling to a high value
-     String base = "";
-     String line = "";
-     String lineValue = "";
-     while (client.connected() || client.available()){
-        if (client.available()){
-          line = client.readStringUntil('\r');
-//          Serial.println(line);
-          lineValue = getValueforTag(line, "flight_category");
-          if (lineValue.length() > 0) {
-            flight_category = lineValue;
-          }
-          lineValue = getValueforTag(line, "visibility_statute_mi");
-          if (lineValue.length() > 0) {
-            visibility = lineValue;
-          }
-          // get the sky cover and cloud base
-          lineValue = getValueforParameter(line, "sky_cover");
-          if (lineValue.length() > 0) {
-            sky_cover = lineValue;
-            base = getValueforParameter(line, "cloud_base_ft_agl");
-            // if the sky cover is broken or overcast, we have a ceiling
-            if (sky_cover == "BKN" || sky_cover == "OVC") {
-              if (base.length() > 0) {
-                cloud_base = base;
-                if (cloud_base.toInt() < ceiling.toInt()) {
-                  ceiling = cloud_base;
-                }
-              }
-            } else {
-              cloud_base = base;
+  // Parse the server response
+  char line[256]; // Buffer for each line
+  char value[256]; // Buffer for tag value
+  while (client.connected() || client.available()) {
+    if (client.available()) {
+      memset(line, 0, sizeof(line)); // Clear the line buffer
+      size_t bytesRead = client.readBytesUntil('\r', line, sizeof(line) - 1);
+      if (bytesRead == 0) {
+        break; // No more data available
+      }
+      line[bytesRead] = '\0'; // Null-terminate the string
+
+      getValueForTag(line, "flight_category", value, sizeof(value));
+      if (value[0] != '\0') {
+        strcpy(flight_category, value);
+      }
+      getValueForTag(line, "visibility_statute_mi", value, sizeof(value));
+      if (value[0] != '\0') {
+        strcpy(visibility, value);
+      }
+      // Get the sky cover and cloud base
+      getValueForParameter(line, "sky_cover", value, sizeof(value));
+      if (value[0] != '\0') {
+        strcpy(sky_cover, value);
+        getValueForParameter(line, "cloud_base_ft_agl", value, sizeof(value));
+        if (value[0] != '\0') {
+          strcpy(cloud_base, value);
+          // If the sky cover is broken or overcast, we have a ceiling
+          if (sky_cover == "BKN" || sky_cover == "OVC") {
+            if (atoi(cloud_base) < ceiling) {
+              ceiling = atoi(cloud_base);
             }
           }
-          lineValue = getValueforTag(line, "wind_speed_kt");
-          if (lineValue.length() > 0) {
-            wind_speed = lineValue.toInt();
-          }
         }
-     } 
-     
-     // close the connection
-     Serial.println("visibility: " + visibility + ", flight category: " + flight_category);
-     Serial.println("sky cover: " + sky_cover + ", cloud base: " + cloud_base);
-     Serial.println("ceiling: " +  (ceiling.toInt() >= 50000 ? "None" : ceiling + " feet"));
-     Serial.println("wind speed: " + String(wind_speed) + " knots");
-     Serial.println(isDrinkingWeather(flight_category, wind_speed, ceiling) ? "Drinking Weather" : "Flying Weather");
-     client.stop();
-     Serial.println("[Disconnected]");
+      }
+      getValueForTag(line, "wind_speed_kt", value, sizeof(value));
+      if (value[0] != '\0') {
+        wind_speed = atoi(value);
+      }
+    }
+  } 
+  
+  // Close the connection
+  Serial.println("visibility: " + String(visibility) + ", flight category: " + String(flight_category));
+  Serial.println("sky cover: " + String(sky_cover) + ", cloud base: " + String(cloud_base));
+  Serial.println("ceiling: " +  (ceiling >= 50000 ? "None" : String(ceiling)) + " feet");
+  Serial.println("wind speed: " + String(wind_speed) + " knots");
+  Serial.println(isDrinkingWeather(flight_category, wind_speed, ceiling) ? "Drinking Weather" : "Flying Weather");
+  client.stop();
+  Serial.println("[Disconnected]");
 }
 
 void handleRoot() {
@@ -411,8 +267,8 @@ void handleWeatherForm() {
 
     // fetch weather from ADDS server
     if (server.argName(0) == "station_id") {
-      identifier = server.arg(0);
-      Serial.println("fetching weather for: " + identifier); 
+      server.arg(0).toCharArray(identifier, sizeof(identifier));
+      Serial.println("fetching weather for: " + String(identifier)); 
       fetchWeather();
       
       // serialize response to JSON 
@@ -421,8 +277,8 @@ void handleWeatherForm() {
     
       doc["identifier"] = identifier;
       doc["flight_category"] = flight_category;
-      doc["ceiling"] = (ceiling.toInt() >= 50000 ? "None" : ceiling + " feet");
-      doc["visibility"] = visibility + " mi";
+      doc["ceiling"] = (ceiling >= 50000 ? "None" : ceiling + " feet");
+      doc["visibility"] = String(visibility) + " mi";
       doc["wind_speed"] = String(wind_speed) + " knots";
       doc["isDrinkingWeather"] = isDrinkingWeather(flight_category, wind_speed, ceiling);
 
@@ -451,13 +307,17 @@ void handleNotFound() {
   server.send(404, "text/plain", message);
 }
 
-void setup(void) {
+void setup() {
   // set button
   pinMode(buttonPin, INPUT_PULLUP);
   
   // initialize serial port
   Serial.begin(115200);
   Serial.println("");
+
+  // debug: get the free heap
+  Serial.print("[Setup()] Free heap is: ");
+  Serial.println(ESP.getFreeHeap());
 
   // initialize NeoPixels
   strip.begin();
@@ -485,10 +345,30 @@ void setup(void) {
   Serial.println("HTTP server started: " +
           WiFi.localIP().toString());
 
+  // Set time via NTP, as required for x.509 validation
+//   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+//
+//   Serial.print("Waiting for NTP time sync: ");
+//   time_t now = time(nullptr);
+//   while (now < 8 * 3600 * 2) {
+//     delay(500);
+//     Serial.print(".");
+//     now = time(nullptr);
+//   }
+//   Serial.println("");
+//   struct tm timeinfo;
+//   gmtime_r(&now, &timeinfo);
+//   Serial.print("Current time: ");
+//   Serial.print(asctime(&timeinfo));
+
   // start MDNS server
-  if (MDNS.begin(mdns_name)) {
-    Serial.println("MDNS responder started");
-  }
+   if (!MDNS.begin("weather")) {
+     Serial.println("Error setting up MDNS responder!");
+     while (1) {
+       delay(1000);
+     }
+   }
+   Serial.println("mDNS responder started");
 
   // start timer
   timerActive = true;
@@ -530,5 +410,5 @@ void loop(void) {
 
   // check for client requests
   Portal.handleClient();
-  MDNS.update();
+   MDNS.update();
 }
