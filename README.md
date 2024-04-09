@@ -2,6 +2,9 @@
 Uses the ESP8266 to query Aviation Digital Data Service (aviationweather.gov/adds) to display current weather status with Adafruit NeoPixels
 
 ![animation](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/media/sign_animation.gif)
+## Getting Started
+See the [User Guide](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/user-guide.md)
+
 ## Requirements
 ### Hardware
 * [Adafruit ESP8266 Feather HUZZAH with headers](https://www.adafruit.com/product/3046)
@@ -76,3 +79,5 @@ to provide your SSID or Password if you use AutoConnect. I recommend looking at 
 
 ## Usage
 Use the Serial Monitor (Tools->Serial Monitor) when you first use the sketch. It will output the local IP address (mDNS is `esp8266.local`) and the status of the server and requests. Navigate to the server's local IP on a web browser (e.g. 192.168.x.x) and you should see an html form. Enter a station identifier (e.g. KLAX for Los Angeles Int'l Airport) and press `Fetch Weather`. The weather will return with `Drinking Weather` if the conditions are IFR, ceiling less than 2000' or winds >25 knots. Feel free to change this in the code as it is strictly for entertainment. There is also an HTML button to manually toggle drinking/flying weather. Finally, a button can be connected to a GPIO port to toggle the lights drinking/flying/off without the need to connect a web client. Enjoy!
+
+For this specific build, see the [User Guide](https://github.com/jbell303/esp8266-weather-station-with-neopixels/blob/master/user-guide.md)
